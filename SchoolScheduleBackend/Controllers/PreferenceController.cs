@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
 using SchoolScheduleBackend.Models;
+using SchoolScheduleBackend.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,35 +16,74 @@ public class PreferenceController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Preference>>> GetAll()
+    public async Task<ActionResult<IEnumerable<PreferenceDto>>> GetAll()
     {
-        return await _context.Preferences.ToListAsync();
+        var preferences = await _context.Preferences.ToListAsync();
+
+        var dtoList = preferences.Select(p => new PreferenceDto
+        {
+            Id = p.Id,
+            EmployeeId = p.EmployeeId,
+            Time = p.Time,
+            Notes = p.Notes
+        });
+
+        return Ok(dtoList);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Preference>> Get(int id)
+    public async Task<ActionResult<PreferenceDto>> Get(int id)
     {
         var preference = await _context.Preferences.FindAsync(id);
         if (preference == null)
             return NotFound();
-        return preference;
+
+        var dto = new PreferenceDto
+        {
+            Id = preference.Id,
+            EmployeeId = preference.EmployeeId,
+            Time = preference.Time,
+            Notes = preference.Notes
+        };
+
+        return Ok(dto);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Preference>> Create(Preference preference)
+    public async Task<ActionResult<PreferenceDto>> Create(PreferenceCreateDto dto)
     {
+        var preference = new Preference
+        {
+            EmployeeId = dto.EmployeeId,
+            Time = dto.Time,
+            Notes = dto.Notes
+        };
+
         _context.Preferences.Add(preference);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = preference.Id }, preference);
+
+        var resultDto = new PreferenceDto
+        {
+            Id = preference.Id,
+            EmployeeId = preference.EmployeeId,
+            Time = preference.Time,
+            Notes = preference.Notes
+        };
+
+        return CreatedAtAction(nameof(Get), new { id = preference.Id }, resultDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Preference preference)
+    public async Task<IActionResult> Update(int id, PreferenceCreateDto dto)
     {
-        if (id != preference.Id)
-            return BadRequest();
+        var preference = await _context.Preferences.FindAsync(id);
+        if (preference == null)
+            return NotFound();
 
-        _context.Entry(preference).State = EntityState.Modified;
+        preference.EmployeeId = dto.EmployeeId;
+        preference.Time = dto.Time;
+        preference.Notes = dto.Notes;
+
         await _context.SaveChangesAsync();
         return NoContent();
     }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
-using SchoolScheduleBackend.Models;
+using SchoolScheduleBackend.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -14,58 +14,83 @@ public class SubjectCabinetController : ControllerBase
         _context = context;
     }
 
-    // GET: api/SubjectCabinet
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SubjectCabinet>>> GetAll()
+    public async Task<ActionResult<IEnumerable<SubjectCabinetReadDto>>> GetAll()
     {
-        return await _context.SubjectCabinets.ToListAsync();
+        var entities = await _context.SubjectCabinets
+            .Include(sc => sc.Subject)
+            .Include(sc => sc.Cabinet)
+            .ToListAsync();
+
+        var result = entities.Select(sc => new SubjectCabinetReadDto
+        {
+            SubjectId = sc.SubjectId,
+            SubjectTitle = sc.Subject?.Title,
+            CabinetId = sc.CabinetId,
+            CabinetNumber = sc.Cabinet?.Number
+        }).ToList();
+
+        return Ok(result);
     }
 
-    // GET: api/SubjectCabinet/{subjectId}/{cabinetId}
+
     [HttpGet("{subjectId}/{cabinetId}")]
-    public async Task<ActionResult<SubjectCabinet>> Get(int subjectId, int cabinetId)
+    public async Task<ActionResult<SubjectCabinetReadDto>> Get(int subjectId, int cabinetId)
     {
-        var entity = await _context.SubjectCabinets.FindAsync(subjectId, cabinetId);
-        if (entity == null)
+        var sc = await _context.SubjectCabinets
+            .Include(sc => sc.Subject)
+            .Include(sc => sc.Cabinet)
+            .FirstOrDefaultAsync(sc => sc.SubjectId == subjectId && sc.CabinetId == cabinetId);
+
+        if (sc == null)
             return NotFound();
-        return entity;
+
+        var dto = new SubjectCabinetReadDto
+        {
+            SubjectId = sc.SubjectId,
+            SubjectTitle = sc.Subject?.Title,
+            CabinetId = sc.CabinetId,
+            CabinetNumber = sc.Cabinet?.Number
+        };
+
+        return Ok(dto);
     }
 
-    // POST: api/SubjectCabinet
     [HttpPost]
-    public async Task<ActionResult<SubjectCabinet>> Create(SubjectCabinet entity)
+    public async Task<ActionResult<SubjectCabinetReadDto>> Create(SubjectCabinetCreateDto dto)
     {
+        var entity = new SubjectCabinet
+        {
+            SubjectId = dto.SubjectId,
+            CabinetId = dto.CabinetId
+        };
+
         _context.SubjectCabinets.Add(entity);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(Get), new { subjectId = entity.SubjectId, cabinetId = entity.CabinetId }, entity);
+        var created = await _context.SubjectCabinets
+            .Include(sc => sc.Subject)
+            .Include(sc => sc.Cabinet)
+            .FirstOrDefaultAsync(sc => sc.SubjectId == dto.SubjectId && sc.CabinetId == dto.CabinetId);
+
+        var result = new SubjectCabinetReadDto
+        {
+            SubjectId = created?.SubjectId ?? dto.SubjectId,
+            SubjectTitle = created?.Subject?.Title,
+            CabinetId = created?.CabinetId ?? dto.CabinetId,
+            CabinetNumber = created?.Cabinet?.Number
+        };
+
+        return CreatedAtAction(nameof(Get), new { subjectId = dto.SubjectId, cabinetId = dto.CabinetId }, result);
     }
 
-    // PUT: api/SubjectCabinet/{subjectId}/{cabinetId}
     [HttpPut("{subjectId}/{cabinetId}")]
-    public async Task<IActionResult> Update(int subjectId, int cabinetId, SubjectCabinet entity)
+    public Task<IActionResult> Update(int subjectId, int cabinetId)
     {
-        if (subjectId != entity.SubjectId || cabinetId != entity.CabinetId)
-            return BadRequest();
-
-        _context.Entry(entity).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!SubjectCabinetExists(subjectId, cabinetId))
-                return NotFound();
-            else
-                throw;
-        }
-
-        return NoContent();
+        return Task.FromResult<IActionResult>(BadRequest("Обновление не поддерживается для связей SubjectCabinet."));
     }
 
-    // DELETE: api/SubjectCabinet/{subjectId}/{cabinetId}
+
     [HttpDelete("{subjectId}/{cabinetId}")]
     public async Task<IActionResult> Delete(int subjectId, int cabinetId)
     {
@@ -77,10 +102,5 @@ public class SubjectCabinetController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
-
-    private bool SubjectCabinetExists(int subjectId, int cabinetId)
-    {
-        return _context.SubjectCabinets.Any(e => e.SubjectId == subjectId && e.CabinetId == cabinetId);
     }
 }

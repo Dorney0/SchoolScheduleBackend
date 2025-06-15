@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
-using SchoolScheduleBackend.Models;
+using SchoolScheduleBackend.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,49 +15,85 @@ public class ChangeLogController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ChangeLog>>> GetAll()
+    public async Task<ActionResult<IEnumerable<ChangeLogDto>>> GetAll()
     {
-        return await _context.ChangeLogs.ToListAsync();
+        return await _context.ChangeLogs
+            .Select(cl => new ChangeLogDto
+            {
+                Id = cl.Id,
+                EmployeeId = cl.EmployeeId,
+                Entity = cl.Entity,
+                ChangeType = cl.ChangeType,
+                Description = cl.Description,
+                ChangeDate = cl.ChangeDate
+            })
+            .ToListAsync();
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ChangeLog>> Get(int id)
+    public async Task<ActionResult<ChangeLogDto>> Get(int id)
     {
-        var changeLog = await _context.ChangeLogs.FindAsync(id);
-        if (changeLog == null)
+        var cl = await _context.ChangeLogs.FindAsync(id);
+        if (cl == null)
             return NotFound();
 
-        return changeLog;
+        return new ChangeLogDto
+        {
+            Id = cl.Id,
+            EmployeeId = cl.EmployeeId,
+            Entity = cl.Entity,
+            ChangeType = cl.ChangeType,
+            Description = cl.Description,
+            ChangeDate = cl.ChangeDate
+        };
     }
 
     [HttpPost]
-    public async Task<ActionResult<ChangeLog>> Create(ChangeLog changeLog)
+    public async Task<ActionResult<ChangeLogDto>> Create(ChangeLogCreateDto dto)
     {
+        var changeLog = new ChangeLog
+        {
+            EmployeeId = dto.EmployeeId,
+            Entity = dto.Entity,
+            ChangeType = dto.ChangeType,
+            Description = dto.Description,
+            ChangeDate = dto.ChangeDate
+        };
+
         _context.ChangeLogs.Add(changeLog);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(Get), new { id = changeLog.Id }, changeLog);
+        var resultDto = new ChangeLogDto
+        {
+            Id = changeLog.Id,
+            EmployeeId = changeLog.EmployeeId,
+            Entity = changeLog.Entity,
+            ChangeType = changeLog.ChangeType,
+            Description = changeLog.Description,
+            ChangeDate = changeLog.ChangeDate
+        };
+
+        return CreatedAtAction(nameof(Get), new { id = changeLog.Id }, resultDto);
     }
 
+
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, ChangeLog changeLog)
+    public async Task<IActionResult> Update(int id, ChangeLogDto dto)
     {
-        if (id != changeLog.Id)
+        if (id != dto.Id)
             return BadRequest();
 
-        _context.Entry(changeLog).State = EntityState.Modified;
+        var existing = await _context.ChangeLogs.FindAsync(id);
+        if (existing == null)
+            return NotFound();
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ChangeLogExists(id))
-                return NotFound();
-            else
-                throw;
-        }
+        existing.EmployeeId = dto.EmployeeId;
+        existing.Entity = dto.Entity;
+        existing.ChangeType = dto.ChangeType;
+        existing.Description = dto.Description;
+        existing.ChangeDate = dto.ChangeDate;
+
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
@@ -73,10 +109,5 @@ public class ChangeLogController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
-
-    private bool ChangeLogExists(int id)
-    {
-        return _context.ChangeLogs.Any(e => e.Id == id);
     }
 }

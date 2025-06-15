@@ -1,6 +1,6 @@
 ﻿using SchoolScheduleBackend.Models;
 
-public class SubjectCabinet
+public class SubjectCabinet : BaseEntity
 {
     public int SubjectId { get; set; }
     public int CabinetId { get; set; }

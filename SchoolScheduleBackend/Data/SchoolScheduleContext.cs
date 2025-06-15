@@ -6,7 +6,39 @@ namespace SchoolScheduleBackend.Data
     public class SchoolScheduleContext : DbContext
     {
         public SchoolScheduleContext(DbContextOptions<SchoolScheduleContext> options)
-            : base(options) { }
+            : base(options)
+        {
+        }
+
+        public override int SaveChanges()
+        {
+            UpdateTimestamps();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateTimestamps()
+        {
+            var entries = ChangeTracker.Entries<BaseEntity>();
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+        }
 
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Class> Classes { get; set; }
@@ -66,6 +98,7 @@ namespace SchoolScheduleBackend.Data
                 .HasOne(sc => sc.Cabinet)
                 .WithMany(c => c.SubjectCabinets)
                 .HasForeignKey(sc => sc.CabinetId);
+            
         }
     }
 }

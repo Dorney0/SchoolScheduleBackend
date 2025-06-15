@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
 using SchoolScheduleBackend.Models;
+using SchoolScheduleBackend.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,48 +16,75 @@ public class CurriculumController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Curriculum>>> GetAll()
+    public async Task<ActionResult<IEnumerable<CurriculumDto>>> GetAll()
     {
-        return await _context.Curricula.ToListAsync();
+        var curricula = await _context.Curricula.ToListAsync();
+
+        var dtoList = curricula.Select(c => new CurriculumDto
+        {
+            Id = c.Id,
+            SubjectId = c.SubjectId,
+            CabinetId = c.CabinetId,
+            HoursPerWeek = c.HoursPerWeek
+        });
+
+        return Ok(dtoList);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Curriculum>> Get(int id)
+    public async Task<ActionResult<CurriculumDto>> Get(int id)
     {
         var curriculum = await _context.Curricula.FindAsync(id);
         if (curriculum == null)
             return NotFound();
-        return curriculum;
+
+        var dto = new CurriculumDto
+        {
+            Id = curriculum.Id,
+            SubjectId = curriculum.SubjectId,
+            CabinetId = curriculum.CabinetId,
+            HoursPerWeek = curriculum.HoursPerWeek
+        };
+
+        return Ok(dto);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Curriculum>> Create(Curriculum curriculum)
+    public async Task<ActionResult<CurriculumDto>> Create(CurriculumCreateDto dto)
     {
+        var curriculum = new Curriculum
+        {
+            SubjectId = dto.SubjectId,
+            CabinetId = dto.CabinetId,
+            HoursPerWeek = dto.HoursPerWeek
+        };
+
         _context.Curricula.Add(curriculum);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = curriculum.Id }, curriculum);
+
+        var resultDto = new CurriculumDto
+        {
+            Id = curriculum.Id,
+            SubjectId = curriculum.SubjectId,
+            CabinetId = curriculum.CabinetId,
+            HoursPerWeek = curriculum.HoursPerWeek
+        };
+
+        return CreatedAtAction(nameof(Get), new { id = curriculum.Id }, resultDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Curriculum curriculum)
+    public async Task<IActionResult> Update(int id, CurriculumCreateDto dto)
     {
-        if (id != curriculum.Id)
-            return BadRequest();
+        var curriculum = await _context.Curricula.FindAsync(id);
+        if (curriculum == null)
+            return NotFound();
 
-        _context.Entry(curriculum).State = EntityState.Modified;
+        curriculum.SubjectId = dto.SubjectId;
+        curriculum.CabinetId = dto.CabinetId;
+        curriculum.HoursPerWeek = dto.HoursPerWeek;
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.Curricula.Any(e => e.Id == id))
-                return NotFound();
-            else
-                throw;
-        }
-
+        await _context.SaveChangesAsync();
         return NoContent();
     }
 

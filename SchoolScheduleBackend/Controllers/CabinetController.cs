@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
 using SchoolScheduleBackend.Models;
-using SchoolScheduleBackend.Dtos;
+using SchoolScheduleBackend.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]

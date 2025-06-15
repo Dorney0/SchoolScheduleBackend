@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
+using SchoolScheduleBackend.DTOs;
 using SchoolScheduleBackend.Models;
 
 [ApiController]
@@ -14,40 +15,77 @@ public class SubjectController : ControllerBase
         _context = context;
     }
 
+    // GET: api/Subject
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Subject>>> GetAll()
+    public async Task<ActionResult<IEnumerable<SubjectReadDto>>> GetAll()
     {
-        return await _context.Subjects.ToListAsync();
+        var subjects = await _context.Subjects
+            .Select(s => new SubjectReadDto
+            {
+                Id = s.Id,
+                Title = s.Title,
+                Description = s.Description
+            })
+            .ToListAsync();
+
+        return Ok(subjects);
     }
 
+    // GET: api/Subject/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Subject>> Get(int id)
+    public async Task<ActionResult<SubjectReadDto>> Get(int id)
     {
         var subject = await _context.Subjects.FindAsync(id);
         if (subject == null)
             return NotFound();
-        return subject;
+
+        return new SubjectReadDto
+        {
+            Id = subject.Id,
+            Title = subject.Title,
+            Description = subject.Description
+        };
     }
 
+    // POST: api/Subject
     [HttpPost]
-    public async Task<ActionResult<Subject>> Create(Subject subject)
+    public async Task<ActionResult<SubjectReadDto>> Create(SubjectCreateDto dto)
     {
+        var subject = new Subject
+        {
+            Title = dto.Title,
+            Description = dto.Description
+        };
+
         _context.Subjects.Add(subject);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = subject.Id }, subject);
+
+        var result = new SubjectReadDto
+        {
+            Id = subject.Id,
+            Title = subject.Title,
+            Description = subject.Description
+        };
+
+        return CreatedAtAction(nameof(Get), new { id = subject.Id }, result);
     }
 
+    // PUT: api/Subject/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Subject subject)
+    public async Task<IActionResult> Update(int id, SubjectCreateDto dto)
     {
-        if (id != subject.Id)
-            return BadRequest();
+        var subject = await _context.Subjects.FindAsync(id);
+        if (subject == null)
+            return NotFound();
 
-        _context.Entry(subject).State = EntityState.Modified;
+        subject.Title = dto.Title;
+        subject.Description = dto.Description;
+
         await _context.SaveChangesAsync();
         return NoContent();
     }
 
+    // DELETE: api/Subject/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -57,6 +95,7 @@ public class SubjectController : ControllerBase
 
         _context.Subjects.Remove(subject);
         await _context.SaveChangesAsync();
+
         return NoContent();
     }
 }

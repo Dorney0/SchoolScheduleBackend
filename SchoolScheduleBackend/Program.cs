@@ -1,27 +1,37 @@
-using SchoolScheduleBackend.Components;
+using Microsoft.EntityFrameworkCore;
+using SchoolScheduleBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+// Подключаем DbContext к PostgreSQL (в Docker)
+builder.Services.AddDbContext<SchoolScheduleContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Добавляем контроллеры Web API
+builder.Services.AddControllers();
+
+// Добавляем Swagger для документации API
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // В режиме разработки включаем Swagger UI
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    // Для продакшена можно настроить обработку ошибок и https
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseAuthorization();
 
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapControllers();
 
 app.Run();

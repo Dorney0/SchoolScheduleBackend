@@ -1,8 +1,7 @@
 ﻿using SchoolScheduleBackend.Models;
 
-public class Schedule
+public class Schedule : BaseEntity
 {
-    public int Id { get; set; }
     public int EmployeeId { get; set; }
     public int SubjectId { get; set; }
     public int CabinetId { get; set; }

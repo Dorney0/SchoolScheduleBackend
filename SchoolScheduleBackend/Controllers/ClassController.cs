@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
 using SchoolScheduleBackend.Models;
+using SchoolScheduleBackend.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,35 +16,74 @@ public class ClassController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Class>>> GetAll()
+    public async Task<ActionResult<IEnumerable<ClassDto>>> GetAll()
     {
-        return await _context.Classes.ToListAsync();
+        var classes = await _context.Classes.ToListAsync();
+
+        var dtoList = classes.Select(c => new ClassDto
+        {
+            Id = c.Id,
+            EmployeeId = c.EmployeeId,
+            Name = c.Name,
+            StudentCount = c.StudentCount
+        });
+
+        return Ok(dtoList);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Class>> Get(int id)
+    public async Task<ActionResult<ClassDto>> Get(int id)
     {
         var classEntity = await _context.Classes.FindAsync(id);
         if (classEntity == null)
             return NotFound();
-        return classEntity;
+
+        var dto = new ClassDto
+        {
+            Id = classEntity.Id,
+            EmployeeId = classEntity.EmployeeId,
+            Name = classEntity.Name,
+            StudentCount = classEntity.StudentCount
+        };
+
+        return Ok(dto);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Class>> Create(Class classEntity)
+    public async Task<ActionResult<ClassDto>> Create(ClassCreateDto dto)
     {
+        var classEntity = new Class
+        {
+            EmployeeId = dto.EmployeeId,
+            Name = dto.Name,
+            StudentCount = dto.StudentCount
+        };
+
         _context.Classes.Add(classEntity);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = classEntity.Id }, classEntity);
+
+        var resultDto = new ClassDto
+        {
+            Id = classEntity.Id,
+            EmployeeId = classEntity.EmployeeId,
+            Name = classEntity.Name,
+            StudentCount = classEntity.StudentCount
+        };
+
+        return CreatedAtAction(nameof(Get), new { id = classEntity.Id }, resultDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Class classEntity)
+    public async Task<IActionResult> Update(int id, ClassCreateDto dto)
     {
-        if (id != classEntity.Id)
-            return BadRequest();
+        var classEntity = await _context.Classes.FindAsync(id);
+        if (classEntity == null)
+            return NotFound();
 
-        _context.Entry(classEntity).State = EntityState.Modified;
+        classEntity.EmployeeId = dto.EmployeeId;
+        classEntity.Name = dto.Name;
+        classEntity.StudentCount = dto.StudentCount;
+
         await _context.SaveChangesAsync();
         return NoContent();
     }

@@ -1,8 +1,7 @@
 ﻿namespace SchoolScheduleBackend.Models;
 
-public class Preference
+public class Preference : BaseEntity
 {
-    public int Id { get; set; }
     public int EmployeeId { get; set; }
     public DateTime Time { get; set; }
     public string Notes { get; set; } = string.Empty; 
