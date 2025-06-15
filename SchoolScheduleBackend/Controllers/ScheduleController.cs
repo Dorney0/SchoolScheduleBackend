@@ -33,6 +33,7 @@ public class ScheduleController : ControllerBase
             CabinetId = s.CabinetId,
             ClassId = s.ClassId,
             Date = s.Date,
+            DayOfWeek = s.DayOfWeek,
             LessonNumber = s.LessonNumber,
             DurationMinutes = s.DurationMinutes,
 
@@ -65,6 +66,7 @@ public class ScheduleController : ControllerBase
             CabinetId = s.CabinetId,
             ClassId = s.ClassId,
             Date = s.Date,
+            DayOfWeek = s.DayOfWeek,
             LessonNumber = s.LessonNumber,
             DurationMinutes = s.DurationMinutes,
 
@@ -87,6 +89,7 @@ public class ScheduleController : ControllerBase
             CabinetId = dto.CabinetId,
             ClassId = dto.ClassId,
             Date = dto.Date,
+            DayOfWeek = dto.DayOfWeek,
             LessonNumber = dto.LessonNumber,
             DurationMinutes = dto.DurationMinutes
         };
@@ -94,7 +97,6 @@ public class ScheduleController : ControllerBase
         _context.Schedules.Add(schedule);
         await _context.SaveChangesAsync();
 
-        // Возвращаем созданный объект с данными (без навигационных свойств)
         var resultDto = new ScheduleDto
         {
             Id = schedule.Id,
@@ -103,6 +105,7 @@ public class ScheduleController : ControllerBase
             CabinetId = schedule.CabinetId,
             ClassId = schedule.ClassId,
             Date = schedule.Date,
+            DayOfWeek = schedule.DayOfWeek,
             LessonNumber = schedule.LessonNumber,
             DurationMinutes = schedule.DurationMinutes
         };
@@ -121,6 +124,7 @@ public class ScheduleController : ControllerBase
         schedule.CabinetId = dto.CabinetId;
         schedule.ClassId = dto.ClassId;
         schedule.Date = dto.Date;
+        schedule.DayOfWeek = dto.DayOfWeek;
         schedule.LessonNumber = dto.LessonNumber;
         schedule.DurationMinutes = dto.DurationMinutes;
 
