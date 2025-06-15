@@ -7,6 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SchoolScheduleContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Добавляем CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Добавляем контроллеры Web API
 builder.Services.AddControllers();
 
@@ -30,6 +41,10 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// Добавляем вызов CORS перед UseAuthorization и MapControllers
+app.UseCors("AllowFrontend");
+
 app.UseAuthorization();
 
 app.MapControllers();
