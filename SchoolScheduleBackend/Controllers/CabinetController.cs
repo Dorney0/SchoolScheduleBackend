@@ -76,7 +76,7 @@ public class CabinetController : ControllerBase
         cabinet.Capacity = dto.Capacity;
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -88,6 +88,6 @@ public class CabinetController : ControllerBase
 
         _context.Cabinets.Remove(cabinet);
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

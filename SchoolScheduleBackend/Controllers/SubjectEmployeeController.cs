@@ -90,6 +90,6 @@ public class SubjectEmployeeController : ControllerBase
         _context.SubjectEmployees.Remove(entity);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

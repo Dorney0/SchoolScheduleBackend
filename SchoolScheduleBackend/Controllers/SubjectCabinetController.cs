@@ -101,6 +101,6 @@ public class SubjectCabinetController : ControllerBase
         _context.SubjectCabinets.Remove(entity);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

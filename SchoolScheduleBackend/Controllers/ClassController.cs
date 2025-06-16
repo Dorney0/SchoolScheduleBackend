@@ -85,7 +85,7 @@ public class ClassController : ControllerBase
         classEntity.StudentCount = dto.StudentCount;
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -97,6 +97,6 @@ public class ClassController : ControllerBase
 
         _context.Classes.Remove(classEntity);
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

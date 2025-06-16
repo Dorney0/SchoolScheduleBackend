@@ -130,7 +130,7 @@ public class ScheduleController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -142,6 +142,6 @@ public class ScheduleController : ControllerBase
         _context.Schedules.Remove(schedule);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

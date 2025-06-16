@@ -82,7 +82,7 @@ public class SubjectController : ControllerBase
         subject.Description = dto.Description;
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     // DELETE: api/Subject/5
@@ -96,6 +96,6 @@ public class SubjectController : ControllerBase
         _context.Subjects.Remove(subject);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

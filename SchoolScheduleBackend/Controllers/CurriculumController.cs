@@ -85,7 +85,7 @@ public class CurriculumController : ControllerBase
         curriculum.HoursPerWeek = dto.HoursPerWeek;
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -98,6 +98,6 @@ public class CurriculumController : ControllerBase
         _context.Curricula.Remove(curriculum);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

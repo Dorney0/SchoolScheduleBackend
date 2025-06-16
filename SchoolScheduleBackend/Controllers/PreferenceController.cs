@@ -85,7 +85,7 @@ public class PreferenceController : ControllerBase
         preference.Notes = dto.Notes;
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -97,6 +97,6 @@ public class PreferenceController : ControllerBase
 
         _context.Preferences.Remove(preference);
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

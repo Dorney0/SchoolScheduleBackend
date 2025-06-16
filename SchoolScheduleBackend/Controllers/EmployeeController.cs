@@ -90,7 +90,7 @@ public class EmployeeController : ControllerBase
         employee.Phone = dto.Phone;
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -102,6 +102,6 @@ public class EmployeeController : ControllerBase
 
         _context.Employees.Remove(employee);
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }

@@ -50,6 +50,7 @@ namespace SchoolScheduleBackend.Data
         public DbSet<SubjectCabinet> SubjectCabinets { get; set; }
         public DbSet<Curriculum> Curricula { get; set; }
         public DbSet<ChangeLog> ChangeLogs { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,7 +66,7 @@ namespace SchoolScheduleBackend.Data
             modelBuilder.Entity<SubjectCabinet>().ToTable("subjectcabinets");
             modelBuilder.Entity<Curriculum>().ToTable("curricula");
             modelBuilder.Entity<ChangeLog>().ToTable("changelogs");
-
+            modelBuilder.Entity<User>().ToTable("users");
             // Composite keys
             modelBuilder.Entity<SubjectEmployee>()
                 .HasKey(se => new { se.SubjectId, se.EmployeeId });
@@ -99,6 +100,25 @@ namespace SchoolScheduleBackend.Data
                 .WithMany(c => c.SubjectCabinets)
                 .HasForeignKey(sc => sc.CabinetId);
             
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.User)
+                .WithOne(u => u.Employee)
+                .HasForeignKey<Employee>(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+            
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasDefaultValue("teacher");
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(e => e.Role)
+                    .HasColumnName("Role")
+                    .HasDefaultValue("teacher");
+
+                entity.HasCheckConstraint("CK_User_Role", "\"Role\" IN ('admin', 'teacher')");
+            });
+
         }
     }
 }

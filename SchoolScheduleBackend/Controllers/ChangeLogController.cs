@@ -95,7 +95,7 @@ public class ChangeLogController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Update is successful");
     }
 
     [HttpDelete("{id}")]
@@ -108,6 +108,6 @@ public class ChangeLogController : ControllerBase
         _context.ChangeLogs.Remove(changeLog);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok("Delete is successful");
     }
 }
