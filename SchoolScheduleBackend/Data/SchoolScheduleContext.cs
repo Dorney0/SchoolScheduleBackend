@@ -118,6 +118,30 @@ namespace SchoolScheduleBackend.Data
 
                 entity.HasCheckConstraint("CK_User_Role", "\"Role\" IN ('admin', 'teacher')");
             });
+            modelBuilder.Entity<Schedule>(entity =>
+            {
+                entity.ToTable("schedules");
+
+                entity.HasOne(s => s.Cabinet)
+                    .WithMany(c => c.Schedules)
+                    .HasForeignKey(s => s.CabinetId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(s => s.Employee)
+                    .WithMany(e => e.Schedules)
+                    .HasForeignKey(s => s.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(s => s.Class)
+                    .WithMany(c => c.Schedules)
+                    .HasForeignKey(s => s.ClassId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(s => s.Subject)
+                    .WithMany(sub => sub.Schedules)
+                    .HasForeignKey(s => s.SubjectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
         }
     }

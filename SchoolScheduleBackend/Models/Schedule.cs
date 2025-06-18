@@ -15,5 +15,4 @@ public class Schedule : BaseEntity
     public Subject? Subject { get; set; }
     public Cabinet? Cabinet { get; set; }
     public Class? Class { get; set; }
-
 }

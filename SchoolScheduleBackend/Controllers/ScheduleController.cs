@@ -9,10 +9,11 @@ using SchoolScheduleBackend.Dtos;
 public class ScheduleController : ControllerBase
 {
     private readonly SchoolScheduleContext _context;
-
-    public ScheduleController(SchoolScheduleContext context)
+    private readonly ILogger<ScheduleController> _logger;
+    public ScheduleController(SchoolScheduleContext context, ILogger<ScheduleController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -82,6 +83,15 @@ public class ScheduleController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ScheduleDto>> Create(ScheduleCreateDto dto)
     {
+        _logger.LogInformation("Create schedule: EmployeeId={EmployeeId}, SubjectId={SubjectId}, CabinetId={CabinetId}, ClassId={ClassId}",
+            dto.EmployeeId, dto.SubjectId, dto.CabinetId, dto.ClassId);
+
+        if (dto.EmployeeId <= 0 || dto.SubjectId <= 0 || dto.CabinetId <= 0 || dto.ClassId <= 0)
+        {
+            _logger.LogWarning("Invalid foreign key IDs provided.");
+            return BadRequest("Invalid foreign key IDs.");
+        }
+
         var schedule = new Schedule
         {
             EmployeeId = dto.EmployeeId,

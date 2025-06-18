@@ -2,14 +2,13 @@
 {
     public class User
     {
-        public int Id { get; set; }  // Primary key
+        public int Id { get; set; }  
         public string FullName { get; set; } = null!;
         public string Login { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;  // Хранить хеш пароля!
+        public string PasswordHash { get; set; } = null!;  
         public string? Email { get; set; }
         public string? Phone { get; set; }
-        public string Role { get; set; } = "teacher"; // admin, teacher, external и т.п.
-
+        public string Role { get; set; } = "teacher"; 
         public Employee? Employee { get; set; }
     }
 }
