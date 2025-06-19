@@ -51,6 +51,7 @@ namespace SchoolScheduleBackend.Data
         public DbSet<Curriculum> Curricula { get; set; }
         public DbSet<ChangeLog> ChangeLogs { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Request> Request { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -142,6 +143,20 @@ namespace SchoolScheduleBackend.Data
                     .HasForeignKey(s => s.SubjectId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+            modelBuilder.Entity<Request>().ToTable("requests");
+
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.Sender)
+                .WithMany()
+                .HasForeignKey(r => r.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.Receiver)
+                .WithMany()
+                .HasForeignKey(r => r.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
         }
     }
