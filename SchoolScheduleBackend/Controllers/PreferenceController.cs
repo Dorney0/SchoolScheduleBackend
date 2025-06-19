@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolScheduleBackend.Data;
 using SchoolScheduleBackend.Models;
-using SchoolScheduleBackend.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -23,7 +22,7 @@ public class PreferenceController : ControllerBase
         var dtoList = preferences.Select(p => new PreferenceDto
         {
             Id = p.Id,
-            EmployeeId = p.EmployeeId,
+            UserId = p.UserId,
             Time = p.Time,
             Notes = p.Notes
         });
@@ -41,7 +40,7 @@ public class PreferenceController : ControllerBase
         var dto = new PreferenceDto
         {
             Id = preference.Id,
-            EmployeeId = preference.EmployeeId,
+            UserId = preference.UserId,
             Time = preference.Time,
             Notes = preference.Notes
         };
@@ -53,8 +52,9 @@ public class PreferenceController : ControllerBase
     public async Task<ActionResult<PreferenceDto>> Create(PreferenceCreateDto dto)
     {
         var preference = new Preference
+
         {
-            EmployeeId = dto.EmployeeId,
+            UserId = dto.UserId,
             Time = dto.Time,
             Notes = dto.Notes
         };
@@ -65,7 +65,7 @@ public class PreferenceController : ControllerBase
         var resultDto = new PreferenceDto
         {
             Id = preference.Id,
-            EmployeeId = preference.EmployeeId,
+            UserId = preference.UserId,
             Time = preference.Time,
             Notes = preference.Notes
         };
@@ -80,7 +80,7 @@ public class PreferenceController : ControllerBase
         if (preference == null)
             return NotFound();
 
-        preference.EmployeeId = dto.EmployeeId;
+        preference.UserId = dto.UserId;
         preference.Time = dto.Time;
         preference.Notes = dto.Notes;
 

@@ -45,12 +45,12 @@ namespace SchoolScheduleBackend.Data
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Cabinet> Cabinets { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
-        public DbSet<Preference> Preferences { get; set; }
         public DbSet<SubjectEmployee> SubjectEmployees { get; set; }
         public DbSet<SubjectCabinet> SubjectCabinets { get; set; }
         public DbSet<Curriculum> Curricula { get; set; }
         public DbSet<ChangeLog> ChangeLogs { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Preference> Preferences { get; set; }
         public DbSet<Request> Request { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -62,12 +62,12 @@ namespace SchoolScheduleBackend.Data
             modelBuilder.Entity<Subject>().ToTable("subjects");
             modelBuilder.Entity<Cabinet>().ToTable("cabinets");
             modelBuilder.Entity<Schedule>().ToTable("schedules");
-            modelBuilder.Entity<Preference>().ToTable("preferences");
             modelBuilder.Entity<SubjectEmployee>().ToTable("subjectemployees");
             modelBuilder.Entity<SubjectCabinet>().ToTable("subjectcabinets");
             modelBuilder.Entity<Curriculum>().ToTable("curricula");
             modelBuilder.Entity<ChangeLog>().ToTable("changelogs");
             modelBuilder.Entity<User>().ToTable("users");
+            modelBuilder.Entity<Preference>().ToTable("preferences");
             // Composite keys
             modelBuilder.Entity<SubjectEmployee>()
                 .HasKey(se => new { se.SubjectId, se.EmployeeId });
@@ -156,6 +156,11 @@ namespace SchoolScheduleBackend.Data
                 .WithMany()
                 .HasForeignKey(r => r.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Preference>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Preferences)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }

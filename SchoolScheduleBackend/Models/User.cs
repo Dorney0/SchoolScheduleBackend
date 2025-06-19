@@ -10,5 +10,6 @@
         public string? Phone { get; set; }
         public string Role { get; set; } = "teacher"; 
         public Employee? Employee { get; set; }
+        public ICollection<Preference> Preferences { get; set; } = new List<Preference>();
     }
 }

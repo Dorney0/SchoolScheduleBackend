@@ -7,57 +7,45 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SchoolScheduleBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddTableRequest : Migration
+    public partial class updatetable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "requests",
+                name: "preferences",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SenderId = table.Column<int>(type: "integer", nullable: false),
-                    ReceiverId = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    SchedulePhotosJson = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_requests", x => x.Id);
+                    table.PrimaryKey("PK_preferences", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_requests_users_ReceiverId",
-                        column: x => x.ReceiverId,
+                        name: "FK_preferences_users_UserId",
+                        column: x => x.UserId,
                         principalTable: "users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_requests_users_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_requests_ReceiverId",
-                table: "requests",
-                column: "ReceiverId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_requests_SenderId",
-                table: "requests",
-                column: "SenderId");
+                name: "IX_preferences_UserId",
+                table: "preferences",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "requests");
+                name: "preferences");
         }
     }
 }

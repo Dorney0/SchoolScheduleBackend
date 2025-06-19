@@ -252,9 +252,6 @@ namespace SchoolScheduleBackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("text");
@@ -265,9 +262,12 @@ namespace SchoolScheduleBackend.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("preferences", (string)null);
                 });
@@ -511,13 +511,13 @@ namespace SchoolScheduleBackend.Migrations
 
             modelBuilder.Entity("SchoolScheduleBackend.Models.Preference", b =>
                 {
-                    b.HasOne("SchoolScheduleBackend.Models.Employee", "Employee")
+                    b.HasOne("SchoolScheduleBackend.Models.User", "User")
                         .WithMany("Preferences")
-                        .HasForeignKey("EmployeeId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Employee");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SchoolScheduleBackend.Models.Request", b =>
@@ -597,8 +597,6 @@ namespace SchoolScheduleBackend.Migrations
 
                     b.Navigation("Classes");
 
-                    b.Navigation("Preferences");
-
                     b.Navigation("Schedules");
 
                     b.Navigation("SubjectEmployees");
@@ -618,6 +616,8 @@ namespace SchoolScheduleBackend.Migrations
             modelBuilder.Entity("SchoolScheduleBackend.Models.User", b =>
                 {
                     b.Navigation("Employee");
+
+                    b.Navigation("Preferences");
                 });
 #pragma warning restore 612, 618
         }

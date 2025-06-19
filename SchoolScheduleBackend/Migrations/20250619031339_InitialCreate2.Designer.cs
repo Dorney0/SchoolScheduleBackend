@@ -12,8 +12,8 @@ using SchoolScheduleBackend.Data;
 namespace SchoolScheduleBackend.Migrations
 {
     [DbContext(typeof(SchoolScheduleContext))]
-    [Migration("20250619001556_AddTableRequest")]
-    partial class AddTableRequest
+    [Migration("20250619031339_InitialCreate2")]
+    partial class InitialCreate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -242,37 +242,6 @@ namespace SchoolScheduleBackend.Migrations
                         .IsUnique();
 
                     b.ToTable("employees", (string)null);
-                });
-
-            modelBuilder.Entity("SchoolScheduleBackend.Models.Preference", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("preferences", (string)null);
                 });
 
             modelBuilder.Entity("SchoolScheduleBackend.Models.Request", b =>
@@ -512,17 +481,6 @@ namespace SchoolScheduleBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SchoolScheduleBackend.Models.Preference", b =>
-                {
-                    b.HasOne("SchoolScheduleBackend.Models.Employee", "Employee")
-                        .WithMany("Preferences")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("SchoolScheduleBackend.Models.Request", b =>
                 {
                     b.HasOne("SchoolScheduleBackend.Models.User", "Receiver")
@@ -599,8 +557,6 @@ namespace SchoolScheduleBackend.Migrations
                     b.Navigation("ChangeLogs");
 
                     b.Navigation("Classes");
-
-                    b.Navigation("Preferences");
 
                     b.Navigation("Schedules");
 

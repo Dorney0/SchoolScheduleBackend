@@ -1,10 +1,11 @@
-﻿namespace SchoolScheduleBackend.Models;
-
+﻿using SchoolScheduleBackend.Models;
+namespace SchoolScheduleBackend.Models;
 public class Preference : BaseEntity
 {
-    public int EmployeeId { get; set; }
-    public DateTime Time { get; set; }
-    public string Notes { get; set; } = string.Empty; 
+    public int UserId { get; set; } 
 
-    public Employee? Employee { get; set; } 
+    public DateTime Time { get; set; }
+    public string Notes { get; set; } = string.Empty;
+
+    public User? User { get; set; }
 }
